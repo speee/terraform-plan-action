@@ -1,0 +1,59 @@
+name: 'Terraform plan'
+description: 'Terraform plan on Pull Request'
+inputs:
+  working-directory:
+    description: ''
+    required: true
+    default: '.'
+  aws-access-key-id:
+    description: ''
+    required: false
+  aws-secret-access-key:
+    description: ''
+    required: false
+outputs:
+  plan-stdout:
+    description: Plan stdout
+    value: ${{ steps.plan.outputs.stdout }}
+  plan-stderr:
+    description: Plan stderr
+    value: ${{ steps.plan.outputs.stderr }}
+  plan-exitcode:
+    description: An exit code of the plan command
+    value: ${{ steps.plan.outputs.exitcode }}
+  plan-has-changes:
+    description: A flat indicates that the plan command has changes
+    value: ${{ steps.plan-exitcode.outputs.plan-has-changes }}
+runs:
+  using: composite
+  steps:
+    - run: terraform fmt -check -recursive
+      id: fmt
+      working-directory: "${{ inputs.working-directory }}"
+      shell: bash
+    - run: terraform init
+      id: init
+      working-directory: "${{ inputs.working-directory }}"
+      shell: bash
+    - run: terraform validate
+      id: validate
+      working-directory: "${{ inputs.working-directory }}"
+      shell: bash
+    - run: |
+        set +e
+        terraform plan -detailed-exitcode -input=false
+        set -e
+      id: plan
+      working-directory: "${{ inputs.working-directory }}"
+      shell: bash
+    - run: |
+        planExitcode=${{ steps.plan.outputs.exitcode }}
+        if [ ${planExitcode} -eq 2 ]; then
+          planHasChanges=true
+        else
+          planHasChanges=false
+        fi
+        echo ::set-output name=plan-has-changes::${planHasChanges}
+      id: plan-exitcode
+      working-directory: "${{ inputs.working-directory }}"
+      shell: bash
