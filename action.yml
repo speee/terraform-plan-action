@@ -18,9 +18,6 @@ outputs:
   plan-stderr:
     description: Plan stderr
     value: ${{ steps.plan.outputs.stderr }}
-  plan-exitcode:
-    description: An exit code of the plan command
-    value: ${{ steps.plan.outputs.exitcode }}
   plan-has-changes:
     description: A flat indicates that the plan command has changes
     value: ${{ steps.plan-exitcode.outputs.plan-has-changes }}
@@ -48,10 +45,12 @@ runs:
       shell: bash
     - run: |
         planExitcode=${{ steps.plan.outputs.exitcode }}
-        if [ ${planExitcode} -eq 2 ]; then
+        if [ ${planExitcode} -eq 0 ]; then
+          planHasChanges=false
+        elif [ ${planExitcode} -eq 2 ]; then
           planHasChanges=true
         else
-          planHasChanges=false
+          exit ${planExitcode}
         fi
         echo ::set-output name=plan-has-changes::${planHasChanges}
       id: plan-exitcode
