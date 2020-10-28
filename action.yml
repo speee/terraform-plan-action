@@ -5,11 +5,8 @@ inputs:
     description: ''
     required: true
     default: '.'
-  aws-access-key-id:
-    description: ''
-    required: false
-  aws-secret-access-key:
-    description: ''
+  enable-lock:
+    default: true
     required: false
 outputs:
   plan-stdout:
@@ -38,7 +35,7 @@ runs:
       shell: bash
     - run: |
         set +e
-        terraform plan -detailed-exitcode -input=false
+        terraform plan -detailed-exitcode -input=false -lock=${{ inputs.enable-lock }}
         set -e
       id: plan
       working-directory: "${{ inputs.working-directory }}"
