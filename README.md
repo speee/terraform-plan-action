@@ -7,19 +7,56 @@ The `speee/terraform-plan-action` action is a CI action that runs `terraform pla
 ```yaml
 - uses: speee/terraform-plan-action@v1
   with:
-      terraform_version: 0.12.29
+    working-directory: terraform/dir/
 ```
 
 ## Inputs
 
+### `working-directory`
+
+**Required.**
 The action supports the following inputs:
 
-- `working-directory` - (optional) Relative path from repository root to your terraform root module (default `.`).
+### `enable-lock`
 
-- `aws-access-key-id` - (optional) Used when performing `terraform plan` to your AWS environment.
+Optional.
+Relative path from repository root to your terraform root module. Default is `.`.
 
-- `aws-secret-access-key` - (optional)
+## Outputs
 
-- `terraform-version` - (optional) The version of Terraform CLI to install. Defaults to `latest`.
+### `plan-stdout`
 
-- `github-token` - Used when writing comments on your pull request.
+stdout of plan execution. Logs during plan are omitted.
+
+### `plan-stderr`
+
+stderr of plan execution.
+
+### `replace-resources`
+
+JSON strings of resources to be replaced.
+
+An example output format is like below.
+
+```
+["aws_iam_user.foo","aws_iam_user.bar"]
+```
+
+### `create-resources`
+
+JSON strings of resources to be created.
+An example output format is same as `replace-resources`.
+
+### `delete-resources`
+
+JSON strings of resources to be deleted.
+An example output format is same as `replace-resources`.
+
+### `update-resources`
+
+JSON strings of resources to be updated.
+An example output format is same as `replace-resources`.
+
+### `plan-has-changes`
+
+A flat indicates that the plan command has changes.
