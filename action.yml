@@ -2,11 +2,12 @@ name: 'Terraform plan'
 description: 'Terraform plan on Pull Request'
 inputs:
   working-directory:
-    description: ''
+    description: 'Directory path of a root module.'
     required: true
     default: '.'
   enable-lock:
-    default: true
+    description: 'Boolean string whether state locks to be enabled.'
+    default: 'true'
     required: false
 outputs:
   plan-stdout:
@@ -16,7 +17,7 @@ outputs:
     description: Plan stderr
     value: ${{ steps.plan.outputs.stderr }}
   replace-resources:
-    description: JSON strings of resources to be replaced
+    description: JSON strings of resources to be replaced.
     value: ${{ steps.plan_result.outputs.replace-resources }}
   create-resources:
     description: JSON strings of resources to be created.
