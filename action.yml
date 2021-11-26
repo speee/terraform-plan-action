@@ -64,14 +64,14 @@ runs:
         echo "::set-output name=result::$(terraform show tfplan)"
         terraform show -json tfplan | jq -c '.resource_changes' > tfplan.resource_changes.json
         # Ref: https://www.terraform.io/docs/internals/json-format.html#change-representation
-        REPLACE_RESOURCES=$(jq -c '. | map(select(.change.actions | length==2) ) | [.[].address]' < tfplan.resource_changes.json)
-        CREATE_RESOURCES=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "create") ) | [.[].address]' < tfplan.resource_changes.json)
-        DELETE_RESOURCES=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "delete") ) | [.[].address]' < tfplan.resource_changes.json)
-        UPDATE_RESOURCES=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "update") ) | [.[].address]' < tfplan.resource_changes.json)
-        echo "::set-output name=resources-to-be-replaced::${REPLACE_RESOURCES}"
-        echo "::set-output name=resources-to-be-created::${CREATE_RESOURCES}"
-        echo "::set-output name=resources-to-be-deleted::${DELETE_RESOURCES}"
-        echo "::set-output name=resources-to-be-updated::${UPDATE_RESOURCES}"
+        RESOURCES_TO_BE_REPLACED=$(jq -c '. | map(select(.change.actions | length==2) ) | [.[].address]' < tfplan.resource_changes.json)
+        RESOURCES_TO_BE_CREATED=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "create") ) | [.[].address]' < tfplan.resource_changes.json)
+        RESOURCES_TO_BE_DELETED=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "delete") ) | [.[].address]' < tfplan.resource_changes.json)
+        RESOURCES_TO_BE_UPDATED=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "update") ) | [.[].address]' < tfplan.resource_changes.json)
+        echo "::set-output name=resources-to-be-replaced::${RESOURCES_TO_BE_REPLACED}"
+        echo "::set-output name=resources-to-be-created::${RESOURCES_TO_BE_CREATED}"
+        echo "::set-output name=resources-to-be-deleted::${RESOURCES_TO_BE_DELETED}"
+        echo "::set-output name=resources-to-be-updated::${RESOURCES_TO_BE_UPDATED}"
       working-directory: "${{ inputs.working-directory }}"
     - run: |
         planExitcode=${{ steps.plan.outputs.exitcode }}
