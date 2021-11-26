@@ -12,15 +12,17 @@ The `speee/terraform-plan-action` action is a CI action that runs `terraform pla
 
 ## Inputs
 
+This action supports the following inputs.
+
 ### `working-directory`
 
 **Required.**
-The action supports the following inputs:
+Relative path from repository root to your terraform root module. Default is `.`.
 
 ### `enable-lock`
 
 Optional.
-Relative path from repository root to your terraform root module. Default is `.`.
+Flag to determine whether state lock will be enabled. Default is `true`.
 
 ## Outputs
 
