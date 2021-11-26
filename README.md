@@ -7,19 +7,62 @@ The `speee/terraform-plan-action` action is a CI action that runs `terraform pla
 ```yaml
 - uses: speee/terraform-plan-action@v1
   with:
-      terraform_version: 0.12.29
+    working-directory: terraform/dir/
 ```
 
 ## Inputs
 
-The action supports the following inputs:
+This action supports the following inputs.
 
-- `working-directory` - (optional) Relative path from repository root to your terraform root module (default `.`).
+### `working-directory`
 
-- `aws-access-key-id` - (optional) Used when performing `terraform plan` to your AWS environment.
+**Required.**
+Relative path from repository root to your terraform root module. Default is `.`.
 
-- `aws-secret-access-key` - (optional)
+### `enable-lock`
 
-- `terraform-version` - (optional) The version of Terraform CLI to install. Defaults to `latest`.
+Optional.
+Flag to determine whether state lock will be enabled. Default is `true`.
 
-- `github-token` - Used when writing comments on your pull request.
+## Outputs
+
+### `plan-stdout`
+
+stdout of plan execution.
+
+### `plan-stderr`
+
+stderr of plan execution.
+
+### `plan-result`
+
+stdout of plan execution **without logs during plan**.
+
+### `resources-to-be-replaced`
+
+JSON strings of resources to be replaced.
+
+An example output format is like below.
+
+```
+["aws_iam_user.foo","aws_iam_user.bar"]
+```
+
+### `resources-to-be-created`
+
+JSON strings of resources to be created.
+An example output format is same as `resources-to-be-created`.
+
+### `resources-to-be-deleted`
+
+JSON strings of resources to be deleted.
+An example output format is same as `resources-to-be-created`.
+
+### `resources-to-be-updated`
+
+JSON strings of resources to be updated.
+An example output format is same as `resources-to-be-created`.
+
+### `plan-has-changes`
+
+A flag that indicates whether the plan has changes.

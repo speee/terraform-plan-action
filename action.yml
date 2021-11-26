@@ -2,21 +2,37 @@ name: 'Terraform plan'
 description: 'Terraform plan on Pull Request'
 inputs:
   working-directory:
-    description: ''
+    description: 'Directory path of a root module.'
     required: true
     default: '.'
   enable-lock:
-    default: true
+    description: 'Boolean string whether state locks to be enabled.'
+    default: 'true'
     required: false
 outputs:
   plan-stdout:
-    description: Plan stdout
+    description: Plan stdout.
     value: ${{ steps.plan.outputs.stdout }}
   plan-stderr:
-    description: Plan stderr
+    description: Plan stderr.
     value: ${{ steps.plan.outputs.stderr }}
+  plan-result:
+    description: Plan result without logs during plan.
+    value: ${{ steps.plan_result.outputs.result }}
+  resources-to-be-replaced:
+    description: JSON strings of resources to be replaced.
+    value: ${{ steps.plan_result.outputs.resources-to-be-replaced }}
+  resources-to-be-created:
+    description: JSON strings of resources to be created.
+    value: ${{ steps.plan_result.outputs.resources-to-be-created }}
+  resources-to-be-deleted:
+    description: JSON strings of resources to be deleted.
+    value: ${{ steps.plan_result.outputs.resources-to-be-deleted }}
+  resources-to-be-updated:
+    description: JSON strings of resources to be updated.
+    value: ${{ steps.plan_result.outputs.resources-to-be-updated }}
   plan-has-changes:
-    description: A flat indicates that the plan command has changes
+    description: A flag that indicates whether the plan has changes.
     value: ${{ steps.plan-exitcode.outputs.plan-has-changes }}
 runs:
   using: composite
@@ -35,11 +51,28 @@ runs:
       shell: bash
     - run: |
         set +e
-        terraform plan -detailed-exitcode -input=false -lock=${{ inputs.enable-lock }}
+        terraform plan -detailed-exitcode -input=false -lock=${{ inputs.enable-lock }} -out tfplan
         set -e
       id: plan
       working-directory: "${{ inputs.working-directory }}"
       shell: bash
+    - name: Read result of Terraform Plan
+      id: plan_result
+      if: steps.plan.outcome == 'success'
+      shell: bash
+      run: |
+        echo "::set-output name=result::$(terraform show tfplan)"
+        terraform show -json tfplan | jq -c '.resource_changes' > tfplan.resource_changes.json
+        # Ref: https://www.terraform.io/docs/internals/json-format.html#change-representation
+        RESOURCES_TO_BE_REPLACED=$(jq -c '. | map(select(.change.actions | length==2) ) | [.[].address]' < tfplan.resource_changes.json)
+        RESOURCES_TO_BE_CREATED=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "create") ) | [.[].address]' < tfplan.resource_changes.json)
+        RESOURCES_TO_BE_DELETED=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "delete") ) | [.[].address]' < tfplan.resource_changes.json)
+        RESOURCES_TO_BE_UPDATED=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "update") ) | [.[].address]' < tfplan.resource_changes.json)
+        echo "::set-output name=resources-to-be-replaced::${RESOURCES_TO_BE_REPLACED}"
+        echo "::set-output name=resources-to-be-created::${RESOURCES_TO_BE_CREATED}"
+        echo "::set-output name=resources-to-be-deleted::${RESOURCES_TO_BE_DELETED}"
+        echo "::set-output name=resources-to-be-updated::${RESOURCES_TO_BE_UPDATED}"
+      working-directory: "${{ inputs.working-directory }}"
     - run: |
         planExitcode=${{ steps.plan.outputs.exitcode }}
         if [ ${planExitcode} -eq 0 ]; then
