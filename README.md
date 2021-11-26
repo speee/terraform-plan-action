@@ -38,7 +38,7 @@ stderr of plan execution.
 
 stdout of plan execution **without logs during plan**.
 
-### `replace-resources`
+### `resources-to-be-replaced`
 
 JSON strings of resources to be replaced.
 
@@ -48,20 +48,20 @@ An example output format is like below.
 ["aws_iam_user.foo","aws_iam_user.bar"]
 ```
 
-### `create-resources`
+### `resources-to-be-created`
 
 JSON strings of resources to be created.
-An example output format is same as `replace-resources`.
+An example output format is same as `resources-to-be-created`.
 
-### `delete-resources`
+### `resources-to-be-deleted`
 
 JSON strings of resources to be deleted.
-An example output format is same as `replace-resources`.
+An example output format is same as `resources-to-be-created`.
 
-### `update-resources`
+### `resources-to-be-updated`
 
 JSON strings of resources to be updated.
-An example output format is same as `replace-resources`.
+An example output format is same as `resources-to-be-created`.
 
 ### `plan-has-changes`
 

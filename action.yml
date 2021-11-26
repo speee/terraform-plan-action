@@ -19,18 +19,18 @@ outputs:
   plan-result:
     description: Plan result without logs during plan.
     value: ${{ steps.plan_result.outputs.result }}
-  replace-resources:
+  resources-to-be-replaced:
     description: JSON strings of resources to be replaced.
-    value: ${{ steps.plan_result.outputs.replace-resources }}
-  create-resources:
+    value: ${{ steps.plan_result.outputs.resources-to-be-replaced }}
+  resources-to-be-created:
     description: JSON strings of resources to be created.
-    value: ${{ steps.plan_result.outputs.create-resources }}
-  delete-resources:
+    value: ${{ steps.plan_result.outputs.resources-to-be-created }}
+  resources-to-be-deleted:
     description: JSON strings of resources to be deleted.
-    value: ${{ steps.plan_result.outputs.delete-resources }}
-  update-resources:
+    value: ${{ steps.plan_result.outputs.resources-to-be-deleted }}
+  resources-to-be-updated:
     description: JSON strings of resources to be updated.
-    value: ${{ steps.plan_result.outputs.update-resources }}
+    value: ${{ steps.plan_result.outputs.resources-to-be-updated }}
   plan-has-changes:
     description: A flat indicates that the plan command has changes
     value: ${{ steps.plan-exitcode.outputs.plan-has-changes }}
@@ -68,10 +68,10 @@ runs:
         CREATE_RESOURCES=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "create") ) | [.[].address]' < tfplan.resource_changes.json)
         DELETE_RESOURCES=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "delete") ) | [.[].address]' < tfplan.resource_changes.json)
         UPDATE_RESOURCES=$(jq -c '. | map(select(.change.actions | length==1 and .[0] == "update") ) | [.[].address]' < tfplan.resource_changes.json)
-        echo "::set-output name=replace-resources::${REPLACE_RESOURCES}"
-        echo "::set-output name=create-resources::${CREATE_RESOURCES}"
-        echo "::set-output name=delete-resources::${DELETE_RESOURCES}"
-        echo "::set-output name=update-resources::${UPDATE_RESOURCES}"
+        echo "::set-output name=resources-to-be-replaced::${REPLACE_RESOURCES}"
+        echo "::set-output name=resources-to-be-created::${CREATE_RESOURCES}"
+        echo "::set-output name=resources-to-be-deleted::${DELETE_RESOURCES}"
+        echo "::set-output name=resources-to-be-updated::${UPDATE_RESOURCES}"
       working-directory: "${{ inputs.working-directory }}"
     - run: |
         planExitcode=${{ steps.plan.outputs.exitcode }}
