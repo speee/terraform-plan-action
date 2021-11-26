@@ -11,11 +11,14 @@ inputs:
     required: false
 outputs:
   plan-stdout:
-    description: Plan stdout
-    value: ${{ steps.plan_result.outputs.stdout }}
+    description: Plan stdout.
+    value: ${{ steps.plan.outputs.stdout }}
   plan-stderr:
-    description: Plan stderr
+    description: Plan stderr.
     value: ${{ steps.plan.outputs.stderr }}
+  plan-result:
+    description: Plan result without logs during plan.
+    value: ${{ steps.plan_result.outputs.result }}
   replace-resources:
     description: JSON strings of resources to be replaced.
     value: ${{ steps.plan_result.outputs.replace-resources }}
@@ -58,7 +61,7 @@ runs:
       if: steps.plan.outcome == 'success'
       shell: bash
       run: |
-        terraform show tfplan
+        echo "::set-output name=result::$(terraform show tfplan)"
         terraform show -json tfplan | jq -c '.resource_changes' > tfplan.resource_changes.json
         # Ref: https://www.terraform.io/docs/internals/json-format.html#change-representation
         REPLACE_RESOURCES=$(jq -c '. | map(select(.change.actions | length==2) ) | [.[].address]' < tfplan.resource_changes.json)

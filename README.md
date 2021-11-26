@@ -28,11 +28,15 @@ Flag to determine whether state lock will be enabled. Default is `true`.
 
 ### `plan-stdout`
 
-stdout of plan execution. Logs during plan are omitted.
+stdout of plan execution.
 
 ### `plan-stderr`
 
 stderr of plan execution.
+
+### `plan-result`
+
+stdout of plan execution **without logs during plan**.
 
 ### `replace-resources`
 
