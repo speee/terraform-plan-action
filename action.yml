@@ -32,7 +32,7 @@ outputs:
     description: JSON strings of resources to be updated.
     value: ${{ steps.plan_result.outputs.resources-to-be-updated }}
   plan-has-changes:
-    description: A flat indicates that the plan command has changes
+    description: A flag that indicates whether the plan has changes.
     value: ${{ steps.plan-exitcode.outputs.plan-has-changes }}
 runs:
   using: composite

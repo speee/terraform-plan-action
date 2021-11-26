@@ -65,4 +65,4 @@ An example output format is same as `resources-to-be-created`.
 
 ### `plan-has-changes`
 
-A flat indicates that the plan command has changes.
+A flag that indicates whether the plan has changes.
