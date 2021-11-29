@@ -60,7 +60,7 @@ runs:
       id: plan_result
       shell: bash
       run: |
-        terraform show tfplan
+        terraform show tfplan -no-color
         terraform show -json tfplan | jq -c '.resource_changes' > tfplan.resource_changes.json
         # Ref: https://www.terraform.io/docs/internals/json-format.html#change-representation
         RESOURCES_TO_BE_REPLACED=$(jq -c '. | map(select(.change.actions | length==2) ) | [.[].address]' < tfplan.resource_changes.json)
