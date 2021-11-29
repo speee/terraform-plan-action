@@ -61,6 +61,9 @@ runs:
       shell: bash
       run: |
         PLAN_RESULT=$(terraform show tfplan)
+        PLAN_RESULT="${PLAN_RESULT//'%'/'%25'}"
+        PLAN_RESULT="${PLAN_RESULT//$'\n'/'%0A'}"
+        PLAN_RESULT="${PLAN_RESULT//$'\r'/'%0D'}"
         echo "::set-output name=result::${PLAN_RESULT//$'\n'/\\n}"
         terraform show -json tfplan | jq -c '.resource_changes' > tfplan.resource_changes.json
         # Ref: https://www.terraform.io/docs/internals/json-format.html#change-representation
