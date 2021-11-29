@@ -18,7 +18,7 @@ outputs:
     value: ${{ steps.plan.outputs.stderr }}
   plan-result:
     description: Plan result without logs during plan.
-    value: ${{ steps.plan_result.outputs.result }}
+    value: ${{ steps.plan_result.outputs.stdout }}
   resources-to-be-replaced:
     description: JSON strings of resources to be replaced.
     value: ${{ steps.plan_result.outputs.resources-to-be-replaced }}
@@ -60,11 +60,7 @@ runs:
       id: plan_result
       shell: bash
       run: |
-        PLAN_RESULT=$(terraform show tfplan)
-        PLAN_RESULT="${PLAN_RESULT//'%'/'%25'}"
-        PLAN_RESULT="${PLAN_RESULT//$'\n'/'%0A'}"
-        PLAN_RESULT="${PLAN_RESULT//$'\r'/'%0D'}"
-        echo "::set-output name=result::${PLAN_RESULT//$'\n'/\\n}"
+        terraform show tfplan
         terraform show -json tfplan | jq -c '.resource_changes' > tfplan.resource_changes.json
         # Ref: https://www.terraform.io/docs/internals/json-format.html#change-representation
         RESOURCES_TO_BE_REPLACED=$(jq -c '. | map(select(.change.actions | length==2) ) | [.[].address]' < tfplan.resource_changes.json)
