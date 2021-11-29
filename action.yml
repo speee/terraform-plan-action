@@ -58,7 +58,6 @@ runs:
       shell: bash
     - name: Read result of Terraform Plan
       id: plan_result
-      if: steps.plan.outcome == 'success'
       shell: bash
       run: |
         PLAN_RESULT=$(terraform show tfplan)
